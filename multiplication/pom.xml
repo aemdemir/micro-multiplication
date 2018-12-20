@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>microservices.book</groupId>
-	<artifactId>micro-multiplication</artifactId>
+	<artifactId>multiplication</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>micro-multiplication</name>
+	<name>multiplication</name>
 	<description>Social Multiplication App</description>
 
 	<properties>
