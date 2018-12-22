@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.util.List;
 
 
@@ -37,16 +38,17 @@ public final class MultiplicationResultAttemptController {
         return ResponseEntity.ok(attemptCopy);
     }
 
-    @RequiredArgsConstructor
-    @NoArgsConstructor(force = true)
-    @Getter
-    static final class ResultResponse {
-        private final boolean correct;
-    }
-
     @GetMapping
     ResponseEntity<List<MultiplicationResultAttempt>>
     getStatistics(@RequestParam("alias") String alias) {
         return ResponseEntity.ok(multiplicationService.getStatsForUser(alias));
+    }
+
+    @GetMapping("/{resultId}")
+    ResponseEntity<MultiplicationResultAttempt>
+    getResultById(@PathVariable("resultId") final Long resultId) {
+        return ResponseEntity.ok(
+                multiplicationService.getResultById(resultId)
+        );
     }
 }
