@@ -1,6 +1,8 @@
 package microservices.book.gamification.service;
 
 import lombok.extern.slf4j.Slf4j;
+import microservices.book.gamification.client.MultiplicationResultAttemptClient;
+import microservices.book.gamification.client.dto.MultiplicationResultAttempt;
 import microservices.book.gamification.domain.Badge;
 import microservices.book.gamification.domain.BadgeCard;
 import microservices.book.gamification.domain.GameStats;
@@ -19,13 +21,19 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GameServiceImpl implements GameService {
 
+    public static final int LUCKY_NUMBER = 42;
+
     private ScoreCardRepository scoreCardRepository;
     private BadgeCardRepository badgeCardRepository;
+    MultiplicationResultAttemptClient attemptClient;
 
     @Autowired
-    public GameServiceImpl(ScoreCardRepository scoreCardRepository, BadgeCardRepository badgeCardRepository) {
+    public GameServiceImpl(ScoreCardRepository scoreCardRepository,
+                           BadgeCardRepository badgeCardRepository,
+                           MultiplicationResultAttemptClient attemptClient) {
         this.scoreCardRepository = scoreCardRepository;
         this.badgeCardRepository = badgeCardRepository;
+        this.attemptClient = attemptClient;
     }
 
     @Override
@@ -81,16 +89,16 @@ public class GameServiceImpl implements GameService {
             badgeCards.add(firstWonBadge);
         }
 
-//        // Lucky number badge
-//        MultiplicationResultAttempt attempt = attemptClient
-//                .retrieveMultiplicationResultAttemptbyId(attemptId);
-//        if(!containsBadge(badgeCardList, Badge.LUCKY_NUMBER) &&
-//                (LUCKY_NUMBER == attempt.getMultiplicationFactorA() ||
-//                        LUCKY_NUMBER == attempt.getMultiplicationFactorB())) {
-//            BadgeCard luckyNumberBadge = giveBadgeToUser(
-//                    Badge.LUCKY_NUMBER, userId);
-//            badgeCards.add(luckyNumberBadge);
-//        }
+        // Lucky number badge
+        MultiplicationResultAttempt attempt = attemptClient
+                .retrieveMultiplicationResultAttemptbyId(attemptId);
+        if(!containsBadge(badgeCardList, Badge.LUCKY_NUMBER) &&
+                (LUCKY_NUMBER == attempt.getMultiplicationFactorA() ||
+                        LUCKY_NUMBER == attempt.getMultiplicationFactorB())) {
+            BadgeCard luckyNumberBadge = giveBadgeToUser(
+                    Badge.LUCKY_NUMBER, userId);
+            badgeCards.add(luckyNumberBadge);
+        }
 
         return badgeCards;
     }
@@ -107,7 +115,8 @@ public class GameServiceImpl implements GameService {
     /**
      * Convenience method to check the current score against
      * the different thresholds to gain badges.
-     * It also assigns badge to user if the conditions are met. */
+     * It also assigns badge to user if the conditions are met.
+     */
     private Optional<BadgeCard> checkAndGiveBadgeBasedOnScore(final List<BadgeCard> badgeCards, final Badge badge,
                                                               final int score, final int scoreThreshold, final Long userId) {
         if(score >= scoreThreshold && !containsBadge(badgeCards, badge)) {
